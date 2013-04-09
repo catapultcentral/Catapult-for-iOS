@@ -1,9 +1,322 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12D78" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="m3b-c5-ahr">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
-    <scenes/>
+    <scenes>
+        <!--Catapult Slide Panel Controller-->
+        <scene sceneID="eSm-Zx-g0f">
+            <objects>
+                <viewController id="m3b-c5-ahr" customClass="CatapultSlidePanelController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="wkH-sd-lJX">
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="pg1-Ub-P8x"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="axI-d1-Kld" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="91" y="183"/>
+        </scene>
+        <!--Catapult Center Table View Controller - Settings-->
+        <scene sceneID="odR-iL-GKc">
+            <objects>
+                <tableViewController storyboardIdentifier="settingsViewController" id="3in-X5-pBa" customClass="CatapultCenterTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="singleLineEtched" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="E2P-OX-yUF">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Accounts" id="97m-Ew-Fg6">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="Nzj-Kr-eVi" style="IBUITableViewCellStyleDefault" id="pML-jg-fSG">
+                                        <rect key="frame" x="0.0" y="46" width="320" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="10" y="1" width="280" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="All accounts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nzj-Kr-eVi">
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <connections>
+                                            <segue destination="ZVX-yI-ntQ" kind="push" id="DSN-l1-4HG"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="T6f-o1-AEl" style="IBUITableViewCellStyleDefault" id="Pzc-Bn-tWH">
+                                        <rect key="frame" x="0.0" y="91" width="320" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="10" y="0.0" width="280" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Current account" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T6f-o1-AEl">
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="3in-X5-pBa" id="y6m-DG-CKu"/>
+                            <outlet property="delegate" destination="3in-X5-pBa" id="fxd-CG-w1F"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Settings" id="XC2-2H-wvE">
+                        <barButtonItem key="leftBarButtonItem" image="Menu.png" id="ll5-AO-h3i">
+                            <connections>
+                                <action selector="showMenu:" destination="3in-X5-pBa" id="oic-4n-WYk"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="z5l-RK-X3x" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="552" y="864"/>
+        </scene>
+        <!--Catapult Accounts Table View Controller - Accounts-->
+        <scene sceneID="skl-WJ-cBP">
+            <objects>
+                <tableViewController id="ZVX-yI-ntQ" customClass="CatapultAccountsTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="singleLineEtched" rowHeight="98" sectionHeaderHeight="10" sectionFooterHeight="10" id="7tv-rb-wPT">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" rowHeight="98" id="e6g-Xz-pUW">
+                                <rect key="frame" x="0.0" y="46" width="320" height="100"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="10" y="1" width="300" height="97"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="ZVX-yI-ntQ" id="sf1-qq-ft5"/>
+                            <outlet property="delegate" destination="ZVX-yI-ntQ" id="p3j-DB-jQa"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Accounts" id="638-BJ-pfD"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="N6M-xk-nHk" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="955" y="864"/>
+        </scene>
+        <!--Catapult Menu Table View Controller-->
+        <scene sceneID="w0H-Qo-hVU">
+            <objects>
+                <tableViewController storyboardIdentifier="menuViewController" id="Sdq-Ys-0XM" customClass="CatapultMenuTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="singleLineEtched" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="GU9-uu-Zbl">
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection id="kw5-MT-dqt">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="7" indentationWidth="0.0" textLabel="yWF-Wd-6qV" style="IBUITableViewCellStyleDefault" id="M8S-Mu-slI">
+                                        <rect key="frame" x="0.0" y="10" width="320" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="10" y="1" width="300" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yWF-Wd-6qV">
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" textLabel="UKB-lv-w1b" style="IBUITableViewCellStyleDefault" id="O8J-SL-sOf">
+                                        <rect key="frame" x="0.0" y="55" width="320" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="10" y="0.0" width="300" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Deals" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UKB-lv-w1b">
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection id="Jts-IZ-oX5">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="7" indentationWidth="0.0" textLabel="vQg-qN-ZO8" style="IBUITableViewCellStyleDefault" id="Cys-M3-h4c">
+                                        <rect key="frame" x="0.0" y="120" width="320" height="46"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="10" y="1" width="300" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Settings" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vQg-qN-ZO8">
+                                                    <rect key="frame" x="10" y="0.0" width="280" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="Sdq-Ys-0XM" id="fGo-AO-SVE"/>
+                            <outlet property="delegate" destination="Sdq-Ys-0XM" id="p2h-Ty-rXZ"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="ocI-NB-oTm"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hH6-9J-pxb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-399" y="183"/>
+        </scene>
+        <!--Catapult Contacts View Controller-->
+        <scene sceneID="bm9-yZ-J8s">
+            <objects>
+                <viewController storyboardIdentifier="contactsViewController" id="jfw-4i-cU8" customClass="CatapultContactsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="VOF-bu-wFf">
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" barStyle="blackOpaque" translatesAutoresizingMaskIntoConstraints="NO" id="yx1-rA-7iX">
+                                <items>
+                                    <barButtonItem image="Menu.png" id="10T-c3-5BJ">
+                                        <connections>
+                                            <action selector="showMenu:" destination="jfw-4i-cU8" id="BGq-1z-cpb"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="yx1-rA-7iX" firstAttribute="trailing" secondItem="VOF-bu-wFf" secondAttribute="trailing" type="default" id="5j3-KP-xxG"/>
+                            <constraint firstItem="yx1-rA-7iX" firstAttribute="top" secondItem="VOF-bu-wFf" secondAttribute="top" type="default" id="esK-6u-SoY"/>
+                            <constraint firstItem="yx1-rA-7iX" firstAttribute="leading" secondItem="VOF-bu-wFf" secondAttribute="leading" type="default" id="zZb-xz-Nqu"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="0Ra-Q3-ZRe">
+                        <barButtonItem key="leftBarButtonItem" image="Menu.png" id="bGS-C7-w8n"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="LtL-1H-W4O" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="552" y="183"/>
+        </scene>
+        <!--Catapult Deals View Controller-->
+        <scene sceneID="yl1-q0-UCX">
+            <objects>
+                <viewController storyboardIdentifier="dealsViewController" id="GnD-sb-YTw" customClass="CatapultDealsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="1m6-FY-Mg4">
+                        <rect key="frame" x="0.0" y="20" width="320" height="548"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" barStyle="blackOpaque" translatesAutoresizingMaskIntoConstraints="NO" id="kPy-RC-uXU">
+                                <items>
+                                    <barButtonItem image="Menu.png" id="tgZ-V8-IYG">
+                                        <connections>
+                                            <action selector="showMenu:" destination="GnD-sb-YTw" id="kZU-q8-1wa"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="kPy-RC-uXU" firstAttribute="trailing" secondItem="1m6-FY-Mg4" secondAttribute="trailing" type="default" id="QM0-vn-Ulp"/>
+                            <constraint firstItem="kPy-RC-uXU" firstAttribute="leading" secondItem="1m6-FY-Mg4" secondAttribute="leading" type="default" id="ebU-xZ-CLd"/>
+                            <constraint firstItem="kPy-RC-uXU" firstAttribute="top" secondItem="1m6-FY-Mg4" secondAttribute="top" type="default" id="ruu-EY-Aue"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Foq-GQ-1M2"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SuJ-Ah-lio" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="955" y="183"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="bkt-Lx-gGO">
+            <objects>
+                <navigationController id="NSU-q1-bxK" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="blackOpaque" id="kUR-ff-l9E">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="3in-X5-pBa" kind="relationship" relationship="rootViewController" id="sWe-SP-zkv"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eba-7x-QT8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="91" y="864"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Menu.png" width="24" height="15"/>
+    </resources>
+    <classes>
+        <class className="CatapultAccountsTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultAccountsTableViewController.h"/>
+        </class>
+        <class className="CatapultCenterTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultCenterTableViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="showMenu:"/>
+            </relationships>
+        </class>
+        <class className="CatapultCenterViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultCenterViewController.h"/>
+            <relationships>
+                <relationship kind="action" name="showMenu:"/>
+            </relationships>
+        </class>
+        <class className="CatapultContactsViewController" superclassName="CatapultCenterViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultContactsViewController.h"/>
+        </class>
+        <class className="CatapultDealsViewController" superclassName="CatapultCenterViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultDealsViewController.h"/>
+        </class>
+        <class className="CatapultMenuTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultMenuTableViewController.h"/>
+        </class>
+        <class className="CatapultSlidePanelController" superclassName="JASidePanelController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CatapultSlidePanelController.h"/>
+        </class>
+        <class className="JASidePanelController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/JASidePanelController.h"/>
+        </class>
+        <class className="NSLayoutConstraint" superclassName="NSObject">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/NSLayoutConstraint.h"/>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
