@@ -23,6 +23,19 @@
 		8F63B179171325A900458200 /* CatapultContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F63B178171325A900458200 /* CatapultContactsViewController.m */; };
 		8F63B17E1713260A00458200 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F63B17D1713260A00458200 /* QuartzCore.framework */; };
 		8FA1B30D171410CA00348996 /* CatapultCenterTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B30C171410CA00348996 /* CatapultCenterTableViewController.m */; };
+		8FA1B31C17143DCC00348996 /* CatapultSettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B31B17143DCC00348996 /* CatapultSettingsTableViewController.m */; };
+		8FA1B31F17143DE100348996 /* CatapultAccountsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B31E17143DE100348996 /* CatapultAccountsTableViewController.m */; };
+		8FA1B3231714411700348996 /* CatapultAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B3221714411700348996 /* CatapultAccount.m */; };
+		8FA1B3301714427800348996 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B3261714427800348996 /* FMDatabase.m */; };
+		8FA1B3311714427800348996 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B3281714427800348996 /* FMDatabaseAdditions.m */; };
+		8FA1B3321714427800348996 /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B32A1714427800348996 /* FMDatabasePool.m */; };
+		8FA1B3331714427800348996 /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B32C1714427800348996 /* FMDatabaseQueue.m */; };
+		8FA1B3351714427800348996 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B32F1714427800348996 /* FMResultSet.m */; };
+		8FA1B337171442C700348996 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA1B336171442C700348996 /* libsqlite3.dylib */; };
+		8FA1B33A1714436F00348996 /* CatapultBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B3391714436F00348996 /* CatapultBase.m */; };
+		8FA1B34817144D0600348996 /* libOAuth2Client.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA1B34717144D0600348996 /* libOAuth2Client.a */; };
+		8FA1B34A17144D9A00348996 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FA1B34917144D9A00348996 /* Security.framework */; };
+		8FA1B34E171456C200348996 /* CatapultAddAccountWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B34D171456C200348996 /* CatapultAddAccountWebViewController.m */; };
 		8FABB8EF17132F910065DD62 /* CatapultMenuTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FABB8EE17132F910065DD62 /* CatapultMenuTableViewController.m */; };
 		8FABB8F2171330B80065DD62 /* CatapultDealsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FABB8F1171330B80065DD62 /* CatapultDealsViewController.m */; };
 		8FABB8F5171330FE0065DD62 /* Menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FABB8F3171330FE0065DD62 /* Menu.png */; };
@@ -56,6 +69,30 @@
 		8F63B17D1713260A00458200 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		8FA1B30B171410CA00348996 /* CatapultCenterTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultCenterTableViewController.h; sourceTree = "<group>"; };
 		8FA1B30C171410CA00348996 /* CatapultCenterTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultCenterTableViewController.m; sourceTree = "<group>"; };
+		8FA1B31A17143DCC00348996 /* CatapultSettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultSettingsTableViewController.h; sourceTree = "<group>"; };
+		8FA1B31B17143DCC00348996 /* CatapultSettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultSettingsTableViewController.m; sourceTree = "<group>"; };
+		8FA1B31D17143DE100348996 /* CatapultAccountsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultAccountsTableViewController.h; sourceTree = "<group>"; };
+		8FA1B31E17143DE100348996 /* CatapultAccountsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultAccountsTableViewController.m; sourceTree = "<group>"; };
+		8FA1B3211714411700348996 /* CatapultAccount.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultAccount.h; sourceTree = "<group>"; };
+		8FA1B3221714411700348996 /* CatapultAccount.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultAccount.m; sourceTree = "<group>"; };
+		8FA1B3251714427800348996 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		8FA1B3261714427800348996 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		8FA1B3271714427800348996 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		8FA1B3281714427800348996 /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		8FA1B3291714427800348996 /* FMDatabasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabasePool.h; sourceTree = "<group>"; };
+		8FA1B32A1714427800348996 /* FMDatabasePool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabasePool.m; sourceTree = "<group>"; };
+		8FA1B32B1714427800348996 /* FMDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseQueue.h; sourceTree = "<group>"; };
+		8FA1B32C1714427800348996 /* FMDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseQueue.m; sourceTree = "<group>"; };
+		8FA1B32E1714427800348996 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		8FA1B32F1714427800348996 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
+		8FA1B336171442C700348996 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		8FA1B3381714436F00348996 /* CatapultBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultBase.h; sourceTree = "<group>"; };
+		8FA1B3391714436F00348996 /* CatapultBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultBase.m; sourceTree = "<group>"; };
+		8FA1B34717144D0600348996 /* libOAuth2Client.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libOAuth2Client.a; path = "OAuth2Client/build/Release-iphoneos/libOAuth2Client.a"; sourceTree = "<group>"; };
+		8FA1B34917144D9A00348996 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		8FA1B34B1714542D00348996 /* CatapultConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CatapultConstants.h; sourceTree = "<group>"; };
+		8FA1B34C171456C200348996 /* CatapultAddAccountWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultAddAccountWebViewController.h; sourceTree = "<group>"; };
+		8FA1B34D171456C200348996 /* CatapultAddAccountWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultAddAccountWebViewController.m; sourceTree = "<group>"; };
 		8FABB8ED17132F910065DD62 /* CatapultMenuTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultMenuTableViewController.h; sourceTree = "<group>"; };
 		8FABB8EE17132F910065DD62 /* CatapultMenuTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultMenuTableViewController.m; sourceTree = "<group>"; };
 		8FABB8F0171330B80065DD62 /* CatapultDealsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultDealsViewController.h; sourceTree = "<group>"; };
@@ -71,6 +108,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FA1B34A17144D9A00348996 /* Security.framework in Frameworks */,
+				8FA1B34817144D0600348996 /* libOAuth2Client.a in Frameworks */,
+				8FA1B337171442C700348996 /* libsqlite3.dylib in Frameworks */,
 				8F63B17E1713260A00458200 /* QuartzCore.framework in Frameworks */,
 				8F63B14B17131D9500458200 /* UIKit.framework in Frameworks */,
 				8F63B14D17131D9500458200 /* Foundation.framework in Frameworks */,
@@ -84,6 +124,9 @@
 		8F63B13E17131D9500458200 = {
 			isa = PBXGroup;
 			children = (
+				8FA1B34917144D9A00348996 /* Security.framework */,
+				8FA1B34717144D0600348996 /* libOAuth2Client.a */,
+				8FA1B336171442C700348996 /* libsqlite3.dylib */,
 				8F63B17D1713260A00458200 /* QuartzCore.framework */,
 				8F63B15017131D9500458200 /* Catapult */,
 				8F63B14917131D9500458200 /* Frameworks */,
@@ -112,6 +155,8 @@
 		8F63B15017131D9500458200 /* Catapult */ = {
 			isa = PBXGroup;
 			children = (
+				8FA1B3241714427800348996 /* FMDB */,
+				8FA1B320171440FC00348996 /* Models */,
 				8FABB90017134DEE0065DD62 /* Settings Controllers */,
 				8F63B16D17131DF700458200 /* JASidePanel */,
 				8F63B15917131D9500458200 /* CatapultAppDelegate.h */,
@@ -130,6 +175,7 @@
 				8FABB8F8171349170065DD62 /* CatapultCenterViewController.m */,
 				8FA1B30B171410CA00348996 /* CatapultCenterTableViewController.h */,
 				8FA1B30C171410CA00348996 /* CatapultCenterTableViewController.m */,
+				8FA1B34B1714542D00348996 /* CatapultConstants.h */,
 			);
 			path = Catapult;
 			sourceTree = "<group>";
@@ -161,9 +207,43 @@
 			path = JASidePanel;
 			sourceTree = "<group>";
 		};
+		8FA1B320171440FC00348996 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8FA1B3211714411700348996 /* CatapultAccount.h */,
+				8FA1B3221714411700348996 /* CatapultAccount.m */,
+				8FA1B3381714436F00348996 /* CatapultBase.h */,
+				8FA1B3391714436F00348996 /* CatapultBase.m */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		8FA1B3241714427800348996 /* FMDB */ = {
+			isa = PBXGroup;
+			children = (
+				8FA1B3251714427800348996 /* FMDatabase.h */,
+				8FA1B3261714427800348996 /* FMDatabase.m */,
+				8FA1B3271714427800348996 /* FMDatabaseAdditions.h */,
+				8FA1B3281714427800348996 /* FMDatabaseAdditions.m */,
+				8FA1B3291714427800348996 /* FMDatabasePool.h */,
+				8FA1B32A1714427800348996 /* FMDatabasePool.m */,
+				8FA1B32B1714427800348996 /* FMDatabaseQueue.h */,
+				8FA1B32C1714427800348996 /* FMDatabaseQueue.m */,
+				8FA1B32E1714427800348996 /* FMResultSet.h */,
+				8FA1B32F1714427800348996 /* FMResultSet.m */,
+			);
+			path = FMDB;
+			sourceTree = "<group>";
+		};
 		8FABB90017134DEE0065DD62 /* Settings Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				8FA1B31A17143DCC00348996 /* CatapultSettingsTableViewController.h */,
+				8FA1B31B17143DCC00348996 /* CatapultSettingsTableViewController.m */,
+				8FA1B31D17143DE100348996 /* CatapultAccountsTableViewController.h */,
+				8FA1B31E17143DE100348996 /* CatapultAccountsTableViewController.m */,
+				8FA1B34C171456C200348996 /* CatapultAddAccountWebViewController.h */,
+				8FA1B34D171456C200348996 /* CatapultAddAccountWebViewController.m */,
 			);
 			name = "Settings Controllers";
 			sourceTree = "<group>";
@@ -247,6 +327,16 @@
 				8FABB8F2171330B80065DD62 /* CatapultDealsViewController.m in Sources */,
 				8FABB8F9171349170065DD62 /* CatapultCenterViewController.m in Sources */,
 				8FA1B30D171410CA00348996 /* CatapultCenterTableViewController.m in Sources */,
+				8FA1B31C17143DCC00348996 /* CatapultSettingsTableViewController.m in Sources */,
+				8FA1B31F17143DE100348996 /* CatapultAccountsTableViewController.m in Sources */,
+				8FA1B3231714411700348996 /* CatapultAccount.m in Sources */,
+				8FA1B3301714427800348996 /* FMDatabase.m in Sources */,
+				8FA1B3311714427800348996 /* FMDatabaseAdditions.m in Sources */,
+				8FA1B3321714427800348996 /* FMDatabasePool.m in Sources */,
+				8FA1B3331714427800348996 /* FMDatabaseQueue.m in Sources */,
+				8FA1B3351714427800348996 /* FMResultSet.m in Sources */,
+				8FA1B33A1714436F00348996 /* CatapultBase.m in Sources */,
+				8FA1B34E171456C200348996 /* CatapultAddAccountWebViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,7 +423,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Catapult/Catapult-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/OAuth2Client/**";
 				INFOPLIST_FILE = "Catapult/Catapult-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -344,7 +436,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Catapult/Catapult-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/OAuth2Client/**";
 				INFOPLIST_FILE = "Catapult/Catapult-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

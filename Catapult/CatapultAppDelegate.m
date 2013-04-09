@@ -10,6 +10,16 @@
 
 @implementation CatapultAppDelegate
 
++ (void)initialize;
+{
+    [[NXOAuth2AccountStore sharedStore] setClientID:kDoorkeeperClientID
+                                             secret:kDoorkeeperClientSecret
+                                   authorizationURL:[NSURL URLWithString:kDoorkeeperAuthURL]
+                                           tokenURL:[NSURL URLWithString:kDoorkeeperTokenURL]
+                                        redirectURL:[NSURL URLWithString:kDoorkeeperRedirectURL]
+                                     forAccountType:kCatapultAccountType];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
@@ -41,6 +51,10 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    return [[NXOAuth2AccountStore sharedStore] handleRedirectURL:url];
 }
 
 @end

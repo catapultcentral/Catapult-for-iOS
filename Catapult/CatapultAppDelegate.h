@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NXOAuth2.h"
+#import "CatapultConstants.h"
 
 @interface CatapultAppDelegate : UIResponder <UIApplicationDelegate>
 
