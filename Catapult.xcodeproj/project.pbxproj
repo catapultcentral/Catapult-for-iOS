@@ -23,8 +23,6 @@
 		8F63B179171325A900458200 /* CatapultContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F63B178171325A900458200 /* CatapultContactsViewController.m */; };
 		8F63B17E1713260A00458200 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F63B17D1713260A00458200 /* QuartzCore.framework */; };
 		8FA1B30D171410CA00348996 /* CatapultCenterTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B30C171410CA00348996 /* CatapultCenterTableViewController.m */; };
-		8FA1B3101714119500348996 /* CatapultSettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B30F1714119500348996 /* CatapultSettingsTableViewController.m */; };
-		8FA1B3131714128400348996 /* CatapultAccountsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FA1B3121714128400348996 /* CatapultAccountsTableViewController.m */; };
 		8FABB8EF17132F910065DD62 /* CatapultMenuTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FABB8EE17132F910065DD62 /* CatapultMenuTableViewController.m */; };
 		8FABB8F2171330B80065DD62 /* CatapultDealsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8FABB8F1171330B80065DD62 /* CatapultDealsViewController.m */; };
 		8FABB8F5171330FE0065DD62 /* Menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 8FABB8F3171330FE0065DD62 /* Menu.png */; };
@@ -58,10 +56,6 @@
 		8F63B17D1713260A00458200 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		8FA1B30B171410CA00348996 /* CatapultCenterTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultCenterTableViewController.h; sourceTree = "<group>"; };
 		8FA1B30C171410CA00348996 /* CatapultCenterTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultCenterTableViewController.m; sourceTree = "<group>"; };
-		8FA1B30E1714119500348996 /* CatapultSettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultSettingsTableViewController.h; sourceTree = "<group>"; };
-		8FA1B30F1714119500348996 /* CatapultSettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultSettingsTableViewController.m; sourceTree = "<group>"; };
-		8FA1B3111714128400348996 /* CatapultAccountsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultAccountsTableViewController.h; sourceTree = "<group>"; };
-		8FA1B3121714128400348996 /* CatapultAccountsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultAccountsTableViewController.m; sourceTree = "<group>"; };
 		8FABB8ED17132F910065DD62 /* CatapultMenuTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultMenuTableViewController.h; sourceTree = "<group>"; };
 		8FABB8EE17132F910065DD62 /* CatapultMenuTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultMenuTableViewController.m; sourceTree = "<group>"; };
 		8FABB8F0171330B80065DD62 /* CatapultDealsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultDealsViewController.h; sourceTree = "<group>"; };
@@ -170,10 +164,6 @@
 		8FABB90017134DEE0065DD62 /* Settings Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				8FA1B30E1714119500348996 /* CatapultSettingsTableViewController.h */,
-				8FA1B30F1714119500348996 /* CatapultSettingsTableViewController.m */,
-				8FA1B3111714128400348996 /* CatapultAccountsTableViewController.h */,
-				8FA1B3121714128400348996 /* CatapultAccountsTableViewController.m */,
 			);
 			name = "Settings Controllers";
 			sourceTree = "<group>";
@@ -257,8 +247,6 @@
 				8FABB8F2171330B80065DD62 /* CatapultDealsViewController.m in Sources */,
 				8FABB8F9171349170065DD62 /* CatapultCenterViewController.m in Sources */,
 				8FA1B30D171410CA00348996 /* CatapultCenterTableViewController.m in Sources */,
-				8FA1B3101714119500348996 /* CatapultSettingsTableViewController.m in Sources */,
-				8FA1B3131714128400348996 /* CatapultAccountsTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
