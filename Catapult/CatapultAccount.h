@@ -12,6 +12,6 @@
 
 @interface CatapultAccount : CatapultBase
 
-- (BOOL)createAccountWithAccountID:(NSString *)accountID;
+- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed))completion;
 
 @end

@@ -27,99 +27,95 @@
 
 @implementation CatapultAccount
 
-- (BOOL)createAccountWithAccountID:(NSString *)accountID
+- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed))completion;
 {
-    __block BOOL operationSuccessfull;
+    __block BOOL operationSuccessfull = NO;
     
     NXOAuth2Account *account = [[NXOAuth2AccountStore sharedStore] accountWithIdentifier:accountID];
     
-    if (account == nil) {
-        operationSuccessfull = NO;
-    } else {
-        if ([self openDatabaseConnection]) {
-            if ([self createAccountsTable]) {
-                
-                [NXOAuth2Request performMethod:@"GET"
-                                    onResource:[NSURL URLWithString:[NSString stringWithFormat:@"%@/users/me", kCatapultHost]]
-                               usingParameters:nil
-                                   withAccount:account
-                           sendProgressHandler:nil
-                               responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
-                                   if (error != nil) {
-                                       operationSuccessfull = NO;
+    // NOTE: Here, I am not checking if accont is nil, but that shouldn't be a problem
+    
+    [NXOAuth2Request performMethod:@"GET"
+                        onResource:[NSURL URLWithString:[NSString stringWithFormat:@"%@/users/me", kCatapultHost]]
+                   usingParameters:nil
+                       withAccount:account
+               sendProgressHandler:nil
+                   responseHandler:^(NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if (error != nil) {
+                           operationSuccessfull = NO;
 #if DEBUG
-                                       NSLog(@"ERROR: %@", error);
+                           NSLog(@"ERROR: %@", error);
 #endif
-                                       _lastError = error;
-                                   } else {
-                                       NSError *jsonError;
-                                       
-                                       NSDictionary *serializedResponse = [NSJSONSerialization JSONObjectWithData:responseData
-                                                                                                          options:kNilOptions
-                                                                                                            error:&jsonError];
-                                       
-                                       if (jsonError != nil) {
+                           _lastError = error;
+                       } else {
+                           NSError *jsonError;
+                           
+                           NSDictionary *serializedResponse = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                                              options:kNilOptions
+                                                                                                error:&jsonError];
+                           
+                           if (jsonError != nil) {
+                               operationSuccessfull = NO;
+#if DEBUG
+                               NSLog(@"ERROR: %@", jsonError);
+#endif
+                               _lastError = jsonError;
+                           } else {
+                               NSDictionary *user   = [serializedResponse objectForKey:@"user"];
+                               NSDictionary *client = [serializedResponse objectForKey:@"client"];
+                               
+                               NSString *forename    = [user objectForKey:@"forename"];
+                               NSString *surname     = [user objectForKey:@"surname"];
+                               NSString *accountName = [client objectForKey:@"account_name"];
+                               NSString *clientName  = [client objectForKey:@"client_name"];
+                               
+                               if ([self openDatabaseConnection]) {
+                                   if ([self createAccountsTable]) {
+                                       if ([self accountWithNameIsAlreadyAdded:accountName]) {
                                            operationSuccessfull = NO;
+                                           
+                                           _lastError = [NSError errorWithDomain:kCatapultAccountErrorDomain
+                                                                            code:kCatapultDuplicateAccountErrorCode
+                                                                        userInfo:@{@"message": @"You have already added this account"}];
+                                           
 #if DEBUG
-                                           NSLog(@"ERROR: %@", jsonError);
+                                           NSLog(@"ERROR: %@", _lastError);
 #endif
-                                           _lastError = jsonError;
                                        } else {
-                                           NSDictionary *user   = [serializedResponse objectForKey:@"user"];
-                                           NSDictionary *client = [serializedResponse objectForKey:@"client"];
+                                           NSDictionary *logos = [self getAccountLogosForClient:client];
                                            
-                                           NSString *forename    = [user objectForKey:@"forename"];
-                                           NSString *surname     = [user objectForKey:@"surname"];
-                                           NSString *accountName = [client objectForKey:@"account_name"];
-                                           NSString *clientName  = [client objectForKey:@"client_name"];
-                                           
-                                           if ([self accountWithNameIsAlreadyAdded:accountName]) {
-                                               operationSuccessfull = NO;
-                                               
-                                               _lastError = [NSError errorWithDomain:kCatapultAccountErrorDomain
-                                                                                code:kCatapultDuplicateAccountErrorCode
-                                                                            userInfo:@{@"message": @"You have already added this account"}];
-                                               
-#if DEBUG
-                                               NSLog(@"ERROR: %@", _lastError);
-#endif
-                                           } else {
-                                               NSDictionary *logos = [self getAccountLogosForClient:client];
-                                               
-                                               operationSuccessfull = [self.db executeUpdate:@"insert into accounts(account_id, forename, surname, account_name, client_name, smallest_logo, thumb_logo) values(?,?,?,?,?,?,?)",
-                                                                       accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"]];
-                                           }
+                                           operationSuccessfull = [self.db executeUpdate:@"insert into accounts(account_id, forename, surname, account_name, client_name, smallest_logo, thumb_logo) values(?,?,?,?,?,?,?)",
+                                                                   accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"]];
                                        }
+                                   } else {
+                                       operationSuccessfull = NO;
+                                       
+                                       _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                                                        code:kCatapultUnableToCreateTableErrorCode
+                                                                    userInfo:@{@"message": @"Unable to create the accounts table"}];
+                                       
+#if DEBUG
+                                       NSLog(@"ERROR: %@", _lastError);
+#endif
                                    }
-                               }];
-                
-            } else {
-                operationSuccessfull = NO;
-                
-                _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
-                                                 code:kCatapultUnableToCreateTableErrorCode
-                                             userInfo:@{@"message": @"Unable to create the accounts table"}];
-                
+                                   
+                                   [self closeDatabaseConnection];
+                               } else {
+                                   operationSuccessfull = NO;
+                                   
+                                   _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                                                    code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                                                userInfo:@{@"message": @"Unable to open database connection"}];
+                                   
 #if DEBUG
-                NSLog(@"ERROR: %@", _lastError);
+                                   NSLog(@"ERROR: %@", _lastError);
 #endif
-            }
-            
-            [self closeDatabaseConnection];
-        } else {
-            operationSuccessfull = NO;
-            
-            _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
-                                             code:kCatapultUnableToOpenDatabaseConnectionErrorCode
-                                         userInfo:@{@"message": @"Unable to open database connection"}];
-            
-#if DEBUG
-            NSLog(@"ERROR: %@", _lastError);
-#endif
-        }
-    }
-
-    return operationSuccessfull;
+                               }
+                           }
+                       }
+                       
+                       completion(operationSuccessfull);
+                   }];
 }
 
 - (BOOL)createAccountsTable
@@ -134,7 +130,7 @@
     // smallest_account_logo text
     // thumb_account_logo text
     
-    BOOL tableCreationWasSuccessfull = [self.db executeUpdate:@"create table if not exists accounts(id integer primary key autoincrement, account_id varchar(36) not null, forename varchar(255) not null, surname varchar(255) not null, account_name varchar(255) not null, client_name varchar(255) not null, smallest_logo text, thumb_logo text, unique(account_id, account_name) on conflict abort)"];
+    BOOL tableCreationWasSuccessfull = [self.db executeUpdate:@"create table if not exists accounts(id integer primary key autoincrement, account_id varchar(36) not null, forename varchar(255) not null, surname varchar(255) not null, account_name varchar(255) not null, client_name varchar(255) not null, smallest_logo text, thumb_logo text, unique(account_id) on conflict abort, unique(account_name) on conflict abort)"];
     
     if (tableCreationWasSuccessfull) {
         _lastError = nil;
@@ -150,8 +146,15 @@
 
 - (BOOL)accountWithNameIsAlreadyAdded:(NSString *)accountName
 {
-    FMResultSet *account = [self.db executeQuery:@"select count(*) from accounts"];
-    return [account next];
+    FMResultSet *account = [self.db executeQuery:@"select count(*) from accounts where account_name = ?", accountName];
+    
+    int totalCount = 0;
+    
+    if ([account next]) {
+        totalCount = [account intForColumnIndex:0];
+    }
+    
+    return totalCount > 0;
 }
 
 - (NSDictionary *)getAccountLogosForClient:(NSDictionary *)client

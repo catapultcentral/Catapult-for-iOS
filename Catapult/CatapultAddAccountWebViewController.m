@@ -63,23 +63,25 @@
 {
     NXOAuth2Account *account = [notification.userInfo objectForKey:@"NXOAuth2AccountStoreNewAccountUserInfoKey"];
     
-    if ([_accountModel createAccountWithAccountID:account.identifier]) {
-        // Do something
-        NSLog(@"Yay");
-    } else {
-        // Delete the newly created account
-        [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+    [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed) {
+        if (completed) {
+            // Do something
+            NSLog(@"Yay");
+        } else {
+            // Delete the newly created account
+            [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+            
+            UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Account Error"
+                                                                   message:@"Unable to add new account"
+                                                                  delegate:nil
+                                                         cancelButtonTitle:@"OK"
+                                                         otherButtonTitles:nil];
+            
+            [errorMessage show];
+        }
         
-        UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Account Error"
-                                                               message:@"Unable to add new account"
-                                                              delegate:nil
-                                                     cancelButtonTitle:@"OK"
-                                                     otherButtonTitles:nil];
-        
-        [errorMessage show];
-    }
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
 }
 
 @end
