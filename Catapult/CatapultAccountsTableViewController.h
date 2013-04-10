@@ -9,10 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "NXOAuth2.h"
 #import "CatapultConstants.h"
+#import "CatapultAccount.h"
 #import "CatapultAddAccountWebViewController.h"
 
 @interface CatapultAccountsTableViewController : UITableViewController
 
 @property (nonatomic, strong) NSMutableArray *accounts;
+
+- (void)signInWithCatapult:(id)sender;
+
+- (void)signOut:(void (^)(void))callback;
 
 @end

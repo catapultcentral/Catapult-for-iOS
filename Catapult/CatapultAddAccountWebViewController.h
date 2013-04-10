@@ -10,7 +10,7 @@
 #import "NXOAuth2.h"
 #import "CatapultAccount.h"
 
-@interface CatapultAddAccountWebViewController : UIViewController
+@interface CatapultAddAccountWebViewController : UIViewController <UIAlertViewDelegate>
 
 @property (weak, nonatomic) NSURL *url;
 

@@ -17,42 +17,46 @@
 @implementation CatapultAddAccountWebViewController
 {
     CatapultAccount *_accountModel;
-}
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        
-    }
-    return self;
+    id _accountDidChangeObserver;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [[NSNotificationCenter defaultCenter] addObserverForName:NXOAuth2AccountStoreAccountsDidChangeNotification
-                                                      object:[NXOAuth2AccountStore sharedStore]
-                                                       queue:nil
-                                                  usingBlock:^(NSNotification *aNotification){
-                                                      if (aNotification.userInfo != nil) {
-                                                          // Only create an account if a new account was added.
-                                                          // Explanation: This notification will also be triggered on account removal
-                                                          [self performSelector:@selector(createAccount:) withObject:aNotification];
-                                                      }
-                                                  }];
     
     _accountModel = [[CatapultAccount alloc] init];
     
-	// Do any additional setup after loading the view.
+    // Load the authentication request in the web view
     NSURLRequest *request = [NSURLRequest requestWithURL:self.url];
     [self.webView loadRequest:request];
 }
 
-- (void)didReceiveMemoryWarning
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    [super viewDidAppear:animated];
+    
+    _accountDidChangeObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NXOAuth2AccountStoreAccountsDidChangeNotification
+                                                                                  object:[NXOAuth2AccountStore sharedStore]
+                                                                                   queue:nil
+                                                                              usingBlock:^(NSNotification *aNotification){
+                                                                                  if (aNotification.userInfo != nil) {
+                                                                                      // Only create an account if a new account was added.
+                                                                                      // Explanation: This notification will also be triggered on account removal
+                                                                                      [self performSelector:@selector(createAccount:) withObject:aNotification];
+                                                                                  }
+                                                                              }];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:_accountDidChangeObserver];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (IBAction)cancel:(id)sender {
@@ -68,19 +72,27 @@
             // Do something
             NSLog(@"Yay");
         } else {
-            // Delete the newly created account
-            [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+            NSError *error = [_accountModel lastError];
+
+            NSString *alertTitle;
+            NSString *alertMessage;
             
-            UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Account Error"
-                                                                   message:@"Unable to add new account"
-                                                                  delegate:nil
+            if (error != nil && error.code == kCatapultDuplicateAccountErrorCode) {
+                alertTitle = @"Duplicate account error";
+                alertMessage = @"You have already added this account";
+            } else {
+                alertTitle = @"Account error";
+                alertMessage = @"Unable to add new account";
+            }
+            
+            UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:alertTitle
+                                                                   message:alertMessage
+                                                                  delegate:self
                                                          cancelButtonTitle:@"OK"
                                                          otherButtonTitles:nil];
             
             [errorMessage show];
         }
-        
-        [self dismissViewControllerAnimated:YES completion:nil];
     }];
 }
 

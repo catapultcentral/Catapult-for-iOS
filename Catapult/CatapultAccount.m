@@ -228,4 +228,45 @@
     return (imageDidSave) ? imagePath : nil;
 }
 
+- (void)signInWithCatapult:(void (^)(BOOL, NSURL *))completion
+{
+    [self signOutFromCatapult:^ (BOOL completed) {
+        if (completed) {
+            [[NXOAuth2AccountStore sharedStore] requestAccessToAccountWithType:kCatapultAccountType
+                                           withPreparedAuthorizationURLHandler:^(NSURL *preparedURL) {
+                                               completion(YES, preparedURL);
+                                           }];
+        } else {
+            completion(NO, nil);
+        }
+    }];
+}
+
+- (void)signOutFromCatapult:(void (^)(BOOL))completion
+{
+    NXOAuth2Account *account = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
+    
+    if (account != nil) {
+        [NXOAuth2Request performMethod:@"DELETE"
+                            onResource:[NSURL URLWithString:[NSString stringWithFormat:@"%@/logout", kCatapultHost]]
+                       usingParameters:nil
+                           withAccount:account
+                   sendProgressHandler:nil
+                       responseHandler:^ (NSURLResponse *response, NSData *responseData, NSError *error) {
+                           if (error != nil) {
+#if DEBUG
+                               NSLog(@"ERROR: %@", error);
+#endif
+                               completion(NO);
+                           } else {
+                               [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+                               
+                               completion(YES);
+                           }
+                       }];
+    } else {
+        completion(YES);
+    }
+}
+
 @end

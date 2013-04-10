@@ -14,4 +14,8 @@
 
 - (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed))completion;
 
+- (void)signInWithCatapult:(void (^)(BOOL completed, NSURL *preparedURL))completion;
+
+- (void)signOutFromCatapult:(void (^)(BOOL completed))completion;
+
 @end

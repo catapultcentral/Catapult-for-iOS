@@ -10,12 +10,11 @@
 
 @interface CatapultAccountsTableViewController ()
 
-- (void)signInWithCatapult:(id)sender;
-
 @end
 
 @implementation CatapultAccountsTableViewController
 {
+    CatapultAccount *_accountModel;
     NSURL *_preparedAuthURL;
 }
 
@@ -32,6 +31,8 @@
 {
     [super viewDidLoad];
 
+    _accountModel = [[CatapultAccount alloc] init];
+    
     self.accounts = [[NSMutableArray alloc] init];
     
     // TODO: Make the next line execute only if there are no accounts registered yet
@@ -135,11 +136,25 @@
 
 - (void)signInWithCatapult:(id)sender
 {
-    [[NXOAuth2AccountStore sharedStore] requestAccessToAccountWithType:kCatapultAccountType
-                                   withPreparedAuthorizationURLHandler:^(NSURL *preparedURL) {
-                                       _preparedAuthURL = preparedURL;
-                                       [self performSegueWithIdentifier:@"showAddAccountWebView" sender:sender];
-                                   }];
+    [_accountModel signInWithCatapult:^ (BOOL completed, NSURL *preparedURL) {
+        if (completed) {
+            _preparedAuthURL = preparedURL;
+            [self performSegueWithIdentifier:@"showAddAccountWebView" sender:sender];
+        } else {
+            // TODO: Show error or something
+        }
+    }];
+}
+
+- (void)signOut:(void (^)(void))callback
+{
+    [_accountModel signOutFromCatapult:^ (BOOL complete) {
+        if (complete) {
+            callback();
+        } else {
+            // TODO: Show error or something
+        }
+    }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
