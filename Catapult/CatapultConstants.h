@@ -12,19 +12,15 @@
 #if DEBUG
 
 // API authentication
-#define kDoorkeeperClientID     @"9ba84746010a85491f9ac33728690ba78d2967b6a43ea4cd18ea2d566be65ba9"
-#define kDoorkeeperClientSecret @"3e7597673b817f2deda63f2050bb3f4a3976bf47a45dd8e59aaa4761033a492c"
-#define kDoorkeeperAuthURL      @"https://oauth.lvh.me:3000/oauth/authorize"
-#define kDoorkeeperTokenURL     @"https://oauth.lvh.me:3000/oauth/token"
+#define kDoorkeeperClientID     @"717539df0330898e0dfc854b7488d92e534e0aa39789738fa36a9b3d4ebf310d"
+#define kDoorkeeperClientSecret @"e94065156822a5f17362f5a0c2fdd474bc03f3c75a7e5ade4b350de63a5fcd6e"
+#define kDoorkeeperAuthURL      @"https://oauth.audii.me/oauth/authorize"
+#define kDoorkeeperTokenURL     @"https://oauth.audii.me/oauth/token"
 #define kDoorkeeperRedirectURL  @"catapultcentral://ios"
 #define kCatapultAccountType    @"com.cataputlcentral.api"
 
 // API
-#define kCatapultHost           @"https://api.lvh.me:3000/api"
-
-// Custom error domains
-#define kCatapultAccountErrorDomain  @"com.catapultcentral.Catapult.AccountErrorDomain"
-#define kCatapultDatabaseErrorDomain @"com.catapultcentral.Catapult.DatabaseErrorDomain"
+#define kCatapultHost           @"https://api.audii.me/api"
 
 #else
 
