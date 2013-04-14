@@ -12,10 +12,20 @@
 
 @interface CatapultAccount : CatapultBase
 
-- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed))completion;
+- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed, NSDictionary *account))completion;
 
 - (void)signInWithCatapult:(void (^)(BOOL completed, NSURL *preparedURL))completion;
 
 - (void)signOutFromCatapult:(void (^)(BOOL completed))completion;
+
+- (NSArray *)getAllAccountsExceptCurrentOne:(NSString *)currentAccountName;
+
+- (NSArray *)getAllAccounts;
+
+- (NSDictionary *)getCurrentAccount;
+
+- (NSString *)getAccountNameForAccountWithClientName:(NSString *)clientName andUserName:(NSString *)userName;
+
+- (BOOL)deleteAccountWithClientName:(NSString *)clientName andUserName:(NSString* )userName;
 
 @end

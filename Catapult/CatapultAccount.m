@@ -27,9 +27,10 @@
 
 @implementation CatapultAccount
 
-- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed))completion;
+- (void)createAccountWithAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL, NSDictionary *))completion
 {
     __block BOOL operationSuccessfull = NO;
+    __block NSDictionary *createdAccount = nil;
     
     NXOAuth2Account *account = [[NXOAuth2AccountStore sharedStore] accountWithIdentifier:accountID];
     
@@ -86,6 +87,15 @@
                                            
                                            operationSuccessfull = [self.db executeUpdate:@"insert into accounts(account_id, forename, surname, account_name, client_name, smallest_logo, thumb_logo) values(?,?,?,?,?,?,?)",
                                                                    accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"]];
+                                           
+                                           if (operationSuccessfull) {
+                                               FMResultSet *savedAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where account_name = ? limit 1", accountName];
+                                               
+                                               if ([savedAccount next]) {
+                                                   createdAccount = [savedAccount resultDictionary];
+                                                   account.userData = createdAccount;
+                                               }
+                                           }
                                        }
                                    } else {
                                        operationSuccessfull = NO;
@@ -114,7 +124,7 @@
                            }
                        }
                        
-                       completion(operationSuccessfull);
+                       completion(operationSuccessfull, createdAccount);
                    }];
 }
 
@@ -159,13 +169,18 @@
 
 - (NSDictionary *)getAccountLogosForClient:(NSDictionary *)client
 {
+    NSDictionary *returnValue = nil;
+    
     NSString *smallestLogoURLString = [[[client objectForKey:@"logo"] objectForKey:@"smallest"] objectForKey:@"url"];
-    NSString *smallestLogoPath = [self getAccountLogoFromURL:[NSURL URLWithString:smallestLogoURLString]];
-    
     NSString *thumbLogoURLString = [[[client objectForKey:@"logo"] objectForKey:@"thumb"] objectForKey:@"url"];
-    NSString *thumbLogoPath = [self getAccountLogoFromURL:[NSURL URLWithString:thumbLogoURLString]];
+    if ([smallestLogoURLString class] != [NSNull class] && [thumbLogoURLString class] != [NSNull class]) {
+        NSString *smallestLogoPath = [self getAccountLogoFromURL:[NSURL URLWithString:smallestLogoURLString]];
+        NSString *thumbLogoPath = [self getAccountLogoFromURL:[NSURL URLWithString:thumbLogoURLString]];
+        
+        returnValue = @{@"smallest_logo": smallestLogoPath, @"thumb_logo": thumbLogoPath};
+    }
     
-    return @{@"smallest_logo": smallestLogoPath, @"thumb_logo": thumbLogoPath};
+    return returnValue;
 }
 
 - (NSString *)getAccountLogoFromURL:(NSURL *)url
@@ -267,6 +282,113 @@
     } else {
         completion(YES);
     }
+}
+
+- (NSArray *)getAllAccountsExceptCurrentOne:(NSString *)currentAccountName
+{
+    NSMutableArray *results = nil;
+    
+    if ([self openDatabaseConnection]) {
+        if ([self createAccountsTable]) {
+            results = [NSMutableArray array];
+            
+            FMResultSet *resultSet = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where account_name != ?", currentAccountName];
+            
+            while ([resultSet next]) {
+                [results addObject:[resultSet resultDictionary]];
+            }
+        } else {
+            _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                             code:kCatapultUnableToCreateTableErrorCode
+                                         userInfo:@{@"message": @"Unable to create the accounts table"}];
+            
+#if DEBUG
+            NSLog(@"ERROR: %@", _lastError);
+#endif
+        }
+        
+        [self closeDatabaseConnection];
+    } else {
+        _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                         code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                     userInfo:@{@"message": @"Unable to open database connection"}];
+        
+#if DEBUG
+        NSLog(@"ERROR: %@", _lastError);
+#endif
+    }
+    
+    return results;
+}
+
+- (NSArray *)getAllAccounts
+{
+    return [self getAllAccountsExceptCurrentOne:@""];
+}
+
+- (NSDictionary *)getCurrentAccount
+{
+    NXOAuth2Account *currentNXOAuth2Account = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
+    
+    return (NSDictionary *)[currentNXOAuth2Account userData];
+}
+
+- (NSString *)getAccountNameForAccountWithClientName:(NSString *)clientName andUserName:(NSString *)userName
+{
+    NSString *accountName = nil;
+    
+    if ([self openDatabaseConnection]) {
+        FMResultSet *result = [self.db executeQuery:@"select account_name from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
+        
+        NSDictionary *account = nil;
+        
+        if ([result next]) {
+            account = [result resultDictionary];
+        }
+        
+        if (account != nil) {
+            accountName = [account objectForKey:@"account_name"];
+        }
+    } else {
+        _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                         code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                     userInfo:@{@"message": @"Unable to open database connection"}];
+        
+#if DEBUG
+        NSLog(@"ERROR: %@", _lastError);
+#endif
+    }
+    
+    return accountName;
+}
+
+- (BOOL)deleteAccountWithClientName:(NSString *)clientName andUserName:(NSString *)userName
+{
+    BOOL accountDeleted = NO;
+    
+    if ([self openDatabaseConnection]) {
+        accountDeleted = [self.db executeUpdate:@"delete from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
+        
+        if (!accountDeleted) {
+            _lastError = [self.db lastError];
+            
+#if DEBUG
+            NSLog(@"ERROR: %@", _lastError);
+#endif
+        }
+        
+        [self closeDatabaseConnection];
+    } else {
+        _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                         code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                     userInfo:@{@"message": @"Unable to open database connection"}];
+        
+#if DEBUG
+        NSLog(@"ERROR: %@", _lastError);
+#endif
+    }
+    
+    return accountDeleted;
 }
 
 @end

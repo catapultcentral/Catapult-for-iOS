@@ -28,6 +28,9 @@
     
     // Load the authentication request in the web view
     NSURLRequest *request = [NSURLRequest requestWithURL:self.url];
+    
+    self.webView.delegate = self;
+    
     [self.webView loadRequest:request];
 }
 
@@ -59,6 +62,14 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+#if DEBUG
+    NSLog(@"ERROR: %@", error);
+#endif
+    if (error.code == 102 && [error.domain isEqual:@"WebKitErrorDomain"]) return;
+}
+
 - (IBAction)cancel:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -67,10 +78,13 @@
 {
     NXOAuth2Account *account = [notification.userInfo objectForKey:@"NXOAuth2AccountStoreNewAccountUserInfoKey"];
     
-    [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed) {
+    [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
         if (completed) {
-            // Do something
-            NSLog(@"Yay");
+            [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccoutCreatedNotification
+                                                                object:nil
+                                                              userInfo:account];
+            
+            [self dismissViewControllerAnimated:YES completion:nil];
         } else {
             NSError *error = [_accountModel lastError];
 

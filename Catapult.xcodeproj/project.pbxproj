@@ -88,7 +88,7 @@
 		8FA1B336171442C700348996 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		8FA1B3381714436F00348996 /* CatapultBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultBase.h; sourceTree = "<group>"; };
 		8FA1B3391714436F00348996 /* CatapultBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CatapultBase.m; sourceTree = "<group>"; };
-		8FA1B34717144D0600348996 /* libOAuth2Client.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libOAuth2Client.a; path = "OAuth2Client/build/Release-iphoneos/libOAuth2Client.a"; sourceTree = "<group>"; };
+		8FA1B34717144D0600348996 /* libOAuth2Client.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOAuth2Client.a; path = "OAuth2Client/build/Release-iphoneos/libOAuth2Client.a"; sourceTree = "<group>"; };
 		8FA1B34917144D9A00348996 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		8FA1B34B1714542D00348996 /* CatapultConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CatapultConstants.h; sourceTree = "<group>"; };
 		8FA1B34C171456C200348996 /* CatapultAddAccountWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatapultAddAccountWebViewController.h; sourceTree = "<group>"; };

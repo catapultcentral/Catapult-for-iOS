@@ -10,12 +10,16 @@
 
 @interface CatapultAccountsTableViewController ()
 
+- (void)removeAccountFromAccountsArrayUsingAccountName:(NSString *)accountName;
+
 @end
 
 @implementation CatapultAccountsTableViewController
 {
     CatapultAccount *_accountModel;
+    UIBarButtonItem *_backButton;
     NSURL *_preparedAuthURL;
+    id _accountCreatedObserver;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -33,29 +37,43 @@
 
     _accountModel = [[CatapultAccount alloc] init];
     
-    self.accounts = [[NSMutableArray alloc] init];
+    NSDictionary *currentAccount = [_accountModel getCurrentAccount];
     
-    // TODO: Make the next line execute only if there are no accounts registered yet
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                                                                           target:self
-                                                                                           action:@selector(signInWithCatapult:)];
+    if (currentAccount == nil) {
+        self.accounts = [[_accountModel getAllAccounts] mutableCopy];
+    } else {
+        NSMutableArray *allAccounts = [[_accountModel getAllAccountsExceptCurrentOne:[currentAccount objectForKey:@"account_name"]] mutableCopy];
+        [allAccounts addObject:currentAccount];
+        self.accounts = allAccounts;
+    }
     
-    //    NSLog(@"%@", [[NXOAuth2AccountStore sharedStore] accounts]); // TODO: REMOVE THAT FUCKING LINE!!!
+    if (self.accounts.count == 0) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                               target:self
+                                                                                               action:@selector(signInWithCatapult:)];
+    } else {
+        self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    }
+    
+    _accountCreatedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kCatapultAccoutCreatedNotification
+                                                                                object:nil
+                                                                                 queue:nil
+                                                                            usingBlock:^ (NSNotification *notification) {
+                                                                                [self.accounts addObject:notification.userInfo];
+                                                                                
+                                                                                [self.tableView beginUpdates];
+                                                                                
+                                                                                [self.tableView insertSections:[NSIndexSet indexSetWithIndex:(self.accounts.count) -1]
+                                                                                              withRowAnimation:UITableViewRowAnimationTop];
+                                                                                
+                                                                                [self.tableView endUpdates];
+                                                                            }];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (NSMutableArray *)accounts
-{
-    if (_accounts == nil) {
-        _accounts = [[NSMutableArray alloc] init];
-    }
-    
-    return _accounts;
 }
 
 #pragma mark - Table view data source
@@ -77,49 +95,105 @@
     static NSString *CellIdentifier = @"accountCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
     
-    // Configure the cell...
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+    }
+    
+    NSDictionary *account = [self.accounts objectAtIndex:indexPath.section];
+    
+    [cell.textLabel setText:[account objectForKey:@"client_name"]];
+    
+    NSString *forename = [account objectForKey:@"forename"];
+    NSString *surname = [account objectForKey:@"surname"];
+    [cell.detailTextLabel setText:[NSString stringWithFormat:@"%@ %@", forename, surname]];
+    
+    NSString *smallestLogoPath = [account objectForKey:@"smallest_logo"];
+    
+    UIImage *smallestLogo = nil;
+    
+    if (smallestLogoPath != nil && [smallestLogoPath class] != [NSNull class]) {
+        smallestLogo = [UIImage imageWithContentsOfFile:smallestLogoPath];
+    }
+    
+    if (smallestLogo != nil) {
+        cell.imageView.image = smallestLogo;
+    }
+    
+    NSDictionary *currentAccount = [_accountModel getCurrentAccount];
+    
+    if ([[account objectForKey:@"account_name"] isEqualToString:[currentAccount objectForKey:@"account_name"]]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
     
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
 {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+    if (editing) {
+        [super setEditing:editing animated:animated];
+        
+        _backButton = self.navigationItem.leftBarButtonItem;
+        
+        UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                    target:self
+                                                                                    action:@selector(signInWithCatapult:)];
+        self.navigationItem.leftBarButtonItem = leftButton;
+    } else {
+        [super setEditing:editing animated:animated];
+        
+        self.navigationItem.leftBarButtonItem = _backButton;
+    }
 }
-*/
 
-/*
-// Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+//        NSDictionary *account = [_accountModel getAccountWithClientName:cell.textLabel.text andUserName:cell.detailTextLabel.text];
+        
+        NSString *accountName = [_accountModel getAccountNameForAccountWithClientName:cell.textLabel.text andUserName:cell.detailTextLabel.text];
+        
+        if (accountName != nil && [_accountModel deleteAccountWithClientName:cell.textLabel.text andUserName:cell.detailTextLabel.text]) {
+            [self removeAccountFromAccountsArrayUsingAccountName:accountName];
+            
+            [_accountModel signOutFromCatapult:^ (BOOL completed) {
+#if DEBUG
+                if (!completed) {
+                    NSLog(@"ERROR: User was not logged out of the account!");
+                }
+#endif
+                [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationFade];
+                
+                if (self.accounts.count == 0) {
+                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                                                           target:self
+                                                                                                           action:@selector(signInWithCatapult:)];
+                    [self setEditing:NO animated:YES];
+                }
+            }];
+        } else {
+#if DEBUG
+            NSLog(@"ERROR: %@", [_accountModel lastError]);
+#endif
+            UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Deletion unsuccessful"
+                                                                   message:@"Unable to delete selected account"
+                                                                  delegate:nil
+                                                         cancelButtonTitle:@"OK"
+                                                         otherButtonTitles:nil];
+            [errorMessage show];
+        }
+    }
 }
-*/
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
 // Override to support conditional rearranging of the table view.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+    return NO;
 }
-*/
 
 #pragma mark - Table view delegate
 
@@ -136,6 +210,15 @@
 
 - (void)signInWithCatapult:(id)sender
 {
+#if DEBUG
+//    NSArray *accounts = [[NXOAuth2AccountStore sharedStore] accounts];
+//    for (NXOAuth2Account *account in accounts) {
+//        [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+//    }
+//    
+//    return;
+#endif
+    
     [_accountModel signInWithCatapult:^ (BOOL completed, NSURL *preparedURL) {
         if (completed) {
             _preparedAuthURL = preparedURL;
@@ -161,6 +244,21 @@
 {
     CatapultAddAccountWebViewController *webViewController = [segue destinationViewController];
     webViewController.url = _preparedAuthURL;
+}
+
+- (void)removeAccountFromAccountsArrayUsingAccountName:(NSString *)accountName
+{
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSString *account, NSDictionary *binding) {
+        return [account isEqualToString:[binding objectForKey:@"account_name"]];
+    }];
+    
+    [self.accounts enumerateObjectsUsingBlock:^(NSDictionary *account, NSUInteger index, BOOL *stop) {
+        if ([predicate evaluateWithObject:accountName substitutionVariables:account]) {
+            [self.accounts removeObjectAtIndex:index];
+            *stop = YES;
+            return;
+        }
+    }];
 }
 
 @end

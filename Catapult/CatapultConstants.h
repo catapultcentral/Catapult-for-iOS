@@ -28,4 +28,11 @@
 
 #endif
 
+// Custom error domains
+#define kCatapultAccountErrorDomain  @"com.catapultcentral.Catapult.AccountErrorDomain"
+#define kCatapultDatabaseErrorDomain @"com.catapultcentral.Catapult.DatabaseErrorDomain"
+
+// iOS client
+#define kCatapultAccoutCreatedNotification @"CatapultAccountCreated"
+
 #endif
