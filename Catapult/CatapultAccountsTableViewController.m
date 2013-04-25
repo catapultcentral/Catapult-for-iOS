@@ -19,7 +19,7 @@
     CatapultAccount *_accountModel;
     UIBarButtonItem *_backButton;
     NSURL *_preparedAuthURL;
-    id _accountCreatedObserver;
+    NSString *_loginType;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -55,19 +55,26 @@
         self.navigationItem.rightBarButtonItem = self.editButtonItem;
     }
     
-    _accountCreatedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kCatapultAccoutCreatedNotification
-                                                                                object:nil
-                                                                                 queue:nil
-                                                                            usingBlock:^ (NSNotification *notification) {
-                                                                                [self.accounts addObject:notification.userInfo];
-                                                                                
-                                                                                [self.tableView beginUpdates];
-                                                                                
-                                                                                [self.tableView insertSections:[NSIndexSet indexSetWithIndex:(self.accounts.count) -1]
-                                                                                              withRowAnimation:UITableViewRowAnimationTop];
-                                                                                
-                                                                                [self.tableView endUpdates];
-                                                                            }];
+    [[NSNotificationCenter defaultCenter] addObserverForName:kCatapultAccountCreatedNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^ (NSNotification *notification) {
+                                                      [self.accounts addObject:notification.userInfo];
+                                                      
+                                                      [self.tableView beginUpdates];
+                                                      
+                                                      [self.tableView insertSections:[NSIndexSet indexSetWithIndex:(self.accounts.count) -1]
+                                                                    withRowAnimation:UITableViewRowAnimationTop];
+                                                      
+                                                      [self.tableView endUpdates];
+                                                  }];
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:kCatapultAccountLoggedInNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^ (NSNotification *notification) {
+//                                                      NSLog(@"Notification: %@", notification);
+                                                  }];
 }
 
 - (void)didReceiveMemoryWarning
@@ -206,11 +213,30 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
+        [_accountModel signOutFromCatapult:^ (BOOL completed) {
+            if (completed) {
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            } else {
+                UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Sign out error"
+                                                                       message:@"Unable to sign out from Catapult"
+                                                                      delegate:nil
+                                                             cancelButtonTitle:@"OK"
+                                                             otherButtonTitles:nil];
+                
+                [errorMessage show];
+            }
+        }];
+    } else if (cell.accessoryType == UITableViewCellAccessoryNone) {
+        [self signInWithCatapult:cell];
+    }
 }
 
 - (void)signInWithCatapult:(id)sender
 {
 #if DEBUG
+    // NOTE: Uncomment this code to clear the keychain
 //    NSArray *accounts = [[NXOAuth2AccountStore sharedStore] accounts];
 //    for (NXOAuth2Account *account in accounts) {
 //        [[NXOAuth2AccountStore sharedStore] removeAccount:account];
@@ -221,7 +247,16 @@
     
     [_accountModel signInWithCatapult:^ (BOOL completed, NSURL *preparedURL) {
         if (completed) {
-            _preparedAuthURL = preparedURL;
+            if ([sender class] == [UITableViewCell class]) {
+                UITableViewCell *cell = sender;
+                NSString *newURLString = [NSString stringWithFormat:@"%@&client_name=%@", [preparedURL absoluteString], [cell.textLabel.text urlEncodeUsingEncoding:NSUTF8StringEncoding]];
+                _preparedAuthURL = [NSURL URLWithString:newURLString];
+                _loginType = kCatapultSubsequentLogInType;
+            } else {
+                _preparedAuthURL = preparedURL;
+                _loginType = kCatapultFirstLogInType;
+            }
+            
             [self performSegueWithIdentifier:@"showAddAccountWebView" sender:sender];
         } else {
             // TODO: Show error or something
@@ -244,6 +279,7 @@
 {
     CatapultAddAccountWebViewController *webViewController = [segue destinationViewController];
     webViewController.url = _preparedAuthURL;
+    webViewController.loginType = _loginType;
 }
 
 - (void)removeAccountFromAccountsArrayUsingAccountName:(NSString *)accountName

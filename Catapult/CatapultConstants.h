@@ -12,8 +12,8 @@
 #if DEBUG
 
 // API authentication
-#define kDoorkeeperClientID     @"717539df0330898e0dfc854b7488d92e534e0aa39789738fa36a9b3d4ebf310d"
-#define kDoorkeeperClientSecret @"e94065156822a5f17362f5a0c2fdd474bc03f3c75a7e5ade4b350de63a5fcd6e"
+#define kDoorkeeperClientID     @"9eb5646b4570b13f2152cb4612ba2c163f701f10b5d144b91b02ef3924738138"
+#define kDoorkeeperClientSecret @"cc80eca9688dc00947b6878b562acb00ebaf407707ce41924f2157a618cd75da"
 #define kDoorkeeperAuthURL      @"https://oauth.audii.me/oauth/authorize"
 #define kDoorkeeperTokenURL     @"https://oauth.audii.me/oauth/token"
 #define kDoorkeeperRedirectURL  @"catapultcentral://ios"
@@ -33,6 +33,7 @@
 #define kCatapultDatabaseErrorDomain @"com.catapultcentral.Catapult.DatabaseErrorDomain"
 
 // iOS client
-#define kCatapultAccoutCreatedNotification @"CatapultAccountCreated"
+#define kCatapultAccountCreatedNotification @"CatapultAccountCreated"
+#define kCatapultAccountLoggedInNotification @"CatapultAccountLoggedIn"
 
 #endif

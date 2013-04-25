@@ -94,6 +94,9 @@
                                                if ([savedAccount next]) {
                                                    createdAccount = [savedAccount resultDictionary];
                                                    account.userData = createdAccount;
+                                                   
+                                                   NSLog(@"Account in model: %@", account);
+                                                   NSLog(@"Account in keychain: %@", [[NXOAuth2AccountStore sharedStore] accounts]);
                                                }
                                            }
                                        }

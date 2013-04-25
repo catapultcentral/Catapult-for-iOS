@@ -10,9 +10,14 @@
 #import "NXOAuth2.h"
 #import "CatapultAccount.h"
 
+#define kCatapultFirstLogInType @"First"
+#define kCatapultSubsequentLogInType @"Subsequent"
+
 @interface CatapultAddAccountWebViewController : UIViewController <UIAlertViewDelegate, UIWebViewDelegate>
 
 @property (strong, nonatomic) NSURL *url;
+
+@property (strong, nonatomic) NSString *loginType;
 
 @property (strong, nonatomic) IBOutlet UIWebView *webView;
 

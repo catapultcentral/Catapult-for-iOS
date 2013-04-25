@@ -78,36 +78,47 @@
 {
     NXOAuth2Account *account = [notification.userInfo objectForKey:@"NXOAuth2AccountStoreNewAccountUserInfoKey"];
     
-    [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
-        if (completed) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccoutCreatedNotification
-                                                                object:nil
-                                                              userInfo:account];
-            
-            [self dismissViewControllerAnimated:YES completion:nil];
-        } else {
-            NSError *error = [_accountModel lastError];
-
-            NSString *alertTitle;
-            NSString *alertMessage;
-            
-            if (error != nil && error.code == kCatapultDuplicateAccountErrorCode) {
-                alertTitle = @"Duplicate account error";
-                alertMessage = @"You have already added this account";
+    NSLog(@"Account in vc: %@", [[NXOAuth2AccountStore sharedStore] accounts]);
+    
+    if ([self.loginType isEqualToString:kCatapultFirstLogInType]) {
+        [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
+            if (completed) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccountCreatedNotification
+                                                                    object:nil
+                                                                  userInfo:account];
+                
+                [self dismissViewControllerAnimated:YES completion:nil];
             } else {
-                alertTitle = @"Account error";
-                alertMessage = @"Unable to add new account";
+                NSError *error = [_accountModel lastError];
+
+                NSString *alertTitle;
+                NSString *alertMessage;
+                
+                if (error != nil && error.code == kCatapultDuplicateAccountErrorCode) {
+                    alertTitle = @"Duplicate account error";
+                    alertMessage = @"You have already added this account";
+                } else {
+                    alertTitle = @"Account error";
+                    alertMessage = @"Unable to add new account";
+                }
+                
+                UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:alertTitle
+                                                                       message:alertMessage
+                                                                      delegate:self
+                                                             cancelButtonTitle:@"OK"
+                                                             otherButtonTitles:nil];
+                
+                [errorMessage show];
             }
-            
-            UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:alertTitle
-                                                                   message:alertMessage
-                                                                  delegate:self
-                                                         cancelButtonTitle:@"OK"
-                                                         otherButtonTitles:nil];
-            
-            [errorMessage show];
-        }
-    }];
+        }];
+    } else if ([self.loginType isEqualToString:kCatapultSubsequentLogInType])
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccountLoggedInNotification
+                                                            object:nil
+                                                          userInfo:(NSDictionary *)account];
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 @end

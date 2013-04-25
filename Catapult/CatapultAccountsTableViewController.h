@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "NXOAuth2.h"
 #import "CatapultConstants.h"
+#import "NSString+URLEncoding.h"
 #import "CatapultAccount.h"
 #import "CatapultAddAccountWebViewController.h"
 
