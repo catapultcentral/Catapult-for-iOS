@@ -21,6 +21,10 @@
 
 @property (strong, nonatomic) IBOutlet UIWebView *webView;
 
+@property (strong, nonatomic) NSString *clientName;
+
+@property (strong, nonatomic) NSString *userName;
+
 - (IBAction)cancel:(id)sender;
 
 @end

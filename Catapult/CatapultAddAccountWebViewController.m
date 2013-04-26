@@ -76,15 +76,15 @@
 
 - (void)createAccount:(NSNotification *)notification
 {
-    NXOAuth2Account *account = [notification.userInfo objectForKey:@"NXOAuth2AccountStoreNewAccountUserInfoKey"];
+    NXOAuth2Account *keychainAccount = [notification.userInfo objectForKey:@"NXOAuth2AccountStoreNewAccountUserInfoKey"];
     
-    NSLog(@"Account in vc: %@", [[NXOAuth2AccountStore sharedStore] accounts]);
+    __weak typeof(self) weakSelf = self;
     
     if ([self.loginType isEqualToString:kCatapultFirstLogInType]) {
-        [_accountModel createAccountWithAccountID:account.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
+        [_accountModel createAccountWithAccountID:keychainAccount.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
             if (completed) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccountCreatedNotification
-                                                                    object:nil
+                                                                    object:self
                                                                   userInfo:account];
                 
                 [self dismissViewControllerAnimated:YES completion:nil];
@@ -104,7 +104,7 @@
                 
                 UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:alertTitle
                                                                        message:alertMessage
-                                                                      delegate:self
+                                                                      delegate:weakSelf
                                                              cancelButtonTitle:@"OK"
                                                              otherButtonTitles:nil];
                 
@@ -113,9 +113,26 @@
         }];
     } else if ([self.loginType isEqualToString:kCatapultSubsequentLogInType])
     {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccountLoggedInNotification
-                                                            object:nil
-                                                          userInfo:(NSDictionary *)account];
+        [_accountModel setAccountAsCurrentUsingClientName:self.clientName userName:self.userName andAccountID:keychainAccount.identifier andThenComplete:^ (BOOL completed, NSDictionary *account) {
+            if (completed) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kCatapultAccountLoggedInNotification
+                                                                    object:nil
+                                                                  userInfo:account];
+            } else {
+#if DEBUG
+                NSLog(@"Error: The account was not found in the SQLite DB...");
+#endif
+                UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Login error"
+                                                                       message:@"Unable to log in the account"
+                                                                      delegate:weakSelf
+                                                             cancelButtonTitle:@"OK"
+                                                             otherButtonTitles:nil];
+                
+                [errorMessage show];
+            }
+        }];
+        
+        
         
         [self dismissViewControllerAnimated:YES completion:nil];
     }

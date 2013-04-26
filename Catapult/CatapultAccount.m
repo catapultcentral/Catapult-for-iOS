@@ -85,8 +85,8 @@
                                        } else {
                                            NSDictionary *logos = [self getAccountLogosForClient:client];
                                            
-                                           operationSuccessfull = [self.db executeUpdate:@"insert into accounts(account_id, forename, surname, account_name, client_name, smallest_logo, thumb_logo) values(?,?,?,?,?,?,?)",
-                                                                   accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"]];
+                                           operationSuccessfull = [self.db executeUpdate:@"insert into accounts(account_id, forename, surname, account_name, client_name, smallest_logo, thumb_logo, logged_in) values(?,?,?,?,?,?,?,?)",
+                                                                   accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"], @"1"];
                                            
                                            if (operationSuccessfull) {
                                                FMResultSet *savedAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where account_name = ? limit 1", accountName];
@@ -94,9 +94,6 @@
                                                if ([savedAccount next]) {
                                                    createdAccount = [savedAccount resultDictionary];
                                                    account.userData = createdAccount;
-                                                   
-                                                   NSLog(@"Account in model: %@", account);
-                                                   NSLog(@"Account in keychain: %@", [[NXOAuth2AccountStore sharedStore] accounts]);
                                                }
                                            }
                                        }
@@ -131,8 +128,10 @@
                    }];
 }
 
+// NOTE: Don't open/close the database in this method
 - (BOOL)createAccountsTable
 {
+    BOOL operationSuccessful = NO;
     // Accounts table schema
     // id integer primary key autoincrement
     // account_id varchar(36) not null - unique
@@ -142,10 +141,11 @@
     // client_name varchar(255) not null
     // smallest_account_logo text
     // thumb_account_logo text
+    // logged_in char(1) not null
     
-    BOOL tableCreationWasSuccessfull = [self.db executeUpdate:@"create table if not exists accounts(id integer primary key autoincrement, account_id varchar(36) not null, forename varchar(255) not null, surname varchar(255) not null, account_name varchar(255) not null, client_name varchar(255) not null, smallest_logo text, thumb_logo text, unique(account_id) on conflict abort, unique(account_name) on conflict abort)"];
+    operationSuccessful = [self.db executeUpdate:@"create table if not exists accounts(id integer primary key autoincrement, account_id varchar(36) not null, forename varchar(255) not null, surname varchar(255) not null, account_name varchar(255) not null, client_name varchar(255) not null, smallest_logo text, thumb_logo text, logged_in char(1) not null, unique(account_id) on conflict abort, unique(account_name) on conflict abort)"];
     
-    if (tableCreationWasSuccessfull) {
+    if (operationSuccessful) {
         _lastError = nil;
     } else {
         _lastError = [self.db lastError];
@@ -153,10 +153,11 @@
         NSLog(@"Failed to create users table: %@", _lastError);
 #endif
     }
-    
-    return tableCreationWasSuccessfull;
+
+    return operationSuccessful;
 }
 
+// NOTE: Don't open/close the database in this method
 - (BOOL)accountWithNameIsAlreadyAdded:(NSString *)accountName
 {
     FMResultSet *account = [self.db executeQuery:@"select count(*) from accounts where account_name = ?", accountName];
@@ -262,6 +263,8 @@
 
 - (void)signOutFromCatapult:(void (^)(BOOL))completion
 {
+    __block BOOL operationSuccessful = NO;
+    
     NXOAuth2Account *account = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
     
     if (account != nil) {
@@ -271,16 +274,54 @@
                            withAccount:account
                    sendProgressHandler:nil
                        responseHandler:^ (NSURLResponse *response, NSData *responseData, NSError *error) {
-                           if (error != nil) {
+                           if (error != nil && error.code != 401) {
 #if DEBUG
                                NSLog(@"ERROR: %@", error);
 #endif
-                               completion(NO);
                            } else {
-                               [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+                               // Workaround.
+                               if (error != nil && error.code == 401) {
+                                   NSArray *accounts = [[NXOAuth2AccountStore sharedStore] accounts];
+                                   for (NXOAuth2Account *account in accounts) {
+                                       [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+                                   }
+                               }
                                
-                               completion(YES);
+                               if ([self openDatabaseConnection]) {
+                                   if ([self createAccountsTable]) {
+                                       operationSuccessful = [self.db executeUpdate:@"update accounts set logged_in = 0 where logged_in = 1"];
+                                       
+                                       if (operationSuccessful) {
+                                           [[NXOAuth2AccountStore sharedStore] removeAccount:account];
+                                       } else {
+#if DEBUG
+                                           NSLog(@"Error: %@", [self.db lastError]);
+#endif
+                                       }
+                                   } else {
+                                       _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                                                        code:kCatapultUnableToCreateTableErrorCode
+                                                                    userInfo:@{@"message": @"Unable to create the accounts table"}];
+                                       
+#if DEBUG
+                                       NSLog(@"ERROR: %@", _lastError);
+#endif
+                                   }
+                                   
+                                   
+                                   [self closeDatabaseConnection];
+                               } else {
+                                   _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                                                    code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                                                userInfo:@{@"message": @"Unable to open database connection"}];
+                                   
+#if DEBUG
+                                   NSLog(@"ERROR: %@", _lastError);
+#endif
+                               }
                            }
+                           
+                           completion(operationSuccessful);
                        }];
     } else {
         completion(YES);
@@ -341,16 +382,26 @@
     NSString *accountName = nil;
     
     if ([self openDatabaseConnection]) {
-        FMResultSet *result = [self.db executeQuery:@"select account_name from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
-        
-        NSDictionary *account = nil;
-        
-        if ([result next]) {
-            account = [result resultDictionary];
-        }
-        
-        if (account != nil) {
-            accountName = [account objectForKey:@"account_name"];
+        if ([self createAccountsTable]) {
+            FMResultSet *result = [self.db executeQuery:@"select account_name from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
+            
+            NSDictionary *account = nil;
+            
+            if ([result next]) {
+                account = [result resultDictionary];
+            }
+            
+            if (account != nil) {
+                accountName = [account objectForKey:@"account_name"];
+            }
+        } else {
+            _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                             code:kCatapultUnableToCreateTableErrorCode
+                                         userInfo:@{@"message": @"Unable to create the accounts table"}];
+            
+#if DEBUG
+            NSLog(@"ERROR: %@", _lastError);
+#endif
         }
     } else {
         _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
@@ -370,10 +421,20 @@
     BOOL accountDeleted = NO;
     
     if ([self openDatabaseConnection]) {
-        accountDeleted = [self.db executeUpdate:@"delete from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
-        
-        if (!accountDeleted) {
-            _lastError = [self.db lastError];
+        if ([self createAccountsTable]) {
+            accountDeleted = [self.db executeUpdate:@"delete from accounts where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
+            
+            if (!accountDeleted) {
+                _lastError = [self.db lastError];
+                
+#if DEBUG
+                NSLog(@"ERROR: %@", _lastError);
+#endif
+            }    
+        } else {
+            _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                             code:kCatapultUnableToCreateTableErrorCode
+                                         userInfo:@{@"message": @"Unable to create the accounts table"}];
             
 #if DEBUG
             NSLog(@"ERROR: %@", _lastError);
@@ -392,6 +453,55 @@
     }
     
     return accountDeleted;
+}
+
+- (void)setAccountAsCurrentUsingClientName:(NSString *)clientName userName:(NSString *)userName andAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed, NSDictionary *account))completion
+{
+    BOOL operationSuccessfull = NO;
+    NSDictionary *account = nil;
+
+    if ([self openDatabaseConnection]) {
+        if ([self createAccountsTable]) {
+            NXOAuth2Account *keychainAccount = [[NXOAuth2AccountStore sharedStore] accountWithIdentifier:accountID];
+            
+            operationSuccessfull = [self.db executeUpdate:@"update accounts set logged_in = 1 where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
+            
+            if (operationSuccessfull) {
+                FMResultSet *currentAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where logged_in = 1 limit 1"];
+                
+                if ([currentAccount next]) {
+                    account = [currentAccount resultDictionary];
+                    keychainAccount.userData = account;
+                }
+            } else {
+                _lastError = [self.db lastError];
+                
+#if DEBUG
+                NSLog(@"ERROR: %@", _lastError);
+#endif
+            }
+        } else {
+            _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                             code:kCatapultUnableToCreateTableErrorCode
+                                         userInfo:@{@"message": @"Unable to create the accounts table"}];
+            
+#if DEBUG
+            NSLog(@"ERROR: %@", _lastError);
+#endif
+        }
+        
+        [self closeDatabaseConnection];
+    } else {
+        _lastError = [NSError errorWithDomain:kCatapultDatabaseErrorDomain
+                                         code:kCatapultUnableToOpenDatabaseConnectionErrorCode
+                                     userInfo:@{@"message": @"Unable to open database connection"}];
+        
+#if DEBUG
+        NSLog(@"ERROR: %@", _lastError);
+#endif
+    }
+    
+    completion(operationSuccessfull, account);
 }
 
 @end

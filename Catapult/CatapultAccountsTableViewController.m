@@ -20,6 +20,9 @@
     UIBarButtonItem *_backButton;
     NSURL *_preparedAuthURL;
     NSString *_loginType;
+    NSString *_clientName;
+    NSString *_userName;
+    UITableViewCell *_latestAccountCell;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -73,7 +76,7 @@
                                                       object:nil
                                                        queue:nil
                                                   usingBlock:^ (NSNotification *notification) {
-//                                                      NSLog(@"Notification: %@", notification);
+                                                      _latestAccountCell.accessoryType = UITableViewCellAccessoryCheckmark;
                                                   }];
 }
 
@@ -206,18 +209,12 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
     if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
         [_accountModel signOutFromCatapult:^ (BOOL completed) {
             if (completed) {
                 cell.accessoryType = UITableViewCellAccessoryNone;
+                cell.selected = false;
             } else {
                 UIAlertView *errorMessage = [[UIAlertView alloc] initWithTitle:@"Sign out error"
                                                                        message:@"Unable to sign out from Catapult"
@@ -229,6 +226,7 @@
             }
         }];
     } else if (cell.accessoryType == UITableViewCellAccessoryNone) {
+        _latestAccountCell = cell;
         [self signInWithCatapult:cell];
     }
 }
@@ -252,9 +250,13 @@
                 NSString *newURLString = [NSString stringWithFormat:@"%@&client_name=%@", [preparedURL absoluteString], [cell.textLabel.text urlEncodeUsingEncoding:NSUTF8StringEncoding]];
                 _preparedAuthURL = [NSURL URLWithString:newURLString];
                 _loginType = kCatapultSubsequentLogInType;
+                _clientName = cell.textLabel.text;
+                _userName = cell.detailTextLabel.text;
             } else {
                 _preparedAuthURL = preparedURL;
                 _loginType = kCatapultFirstLogInType;
+                _clientName = nil;
+                _userName = nil;
             }
             
             [self performSegueWithIdentifier:@"showAddAccountWebView" sender:sender];
@@ -280,6 +282,8 @@
     CatapultAddAccountWebViewController *webViewController = [segue destinationViewController];
     webViewController.url = _preparedAuthURL;
     webViewController.loginType = _loginType;
+    webViewController.clientName = _clientName;
+    webViewController.userName = _userName;
 }
 
 - (void)removeAccountFromAccountsArrayUsingAccountName:(NSString *)accountName

@@ -18,6 +18,8 @@
 
 - (void)signOutFromCatapult:(void (^)(BOOL completed))completion;
 
+- (void)setAccountAsCurrentUsingClientName:(NSString *)clientName userName:(NSString *)userName andAccountID:(NSString *)accountID andThenComplete:(void (^)(BOOL completed, NSDictionary *account))completion;
+
 - (NSArray *)getAllAccountsExceptCurrentOne:(NSString *)currentAccountName;
 
 - (NSArray *)getAllAccounts;
