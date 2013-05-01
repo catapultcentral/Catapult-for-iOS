@@ -26,6 +26,10 @@
 
 - (NSDictionary *)getCurrentAccount;
 
+- (void)getCurrentClient:(void (^)(BOOL completed, NSDictionary *account, NSDictionary *user))completion;
+
+- (void)getCurrentUser:(void (^)(BOOL completed, NSDictionary *user))completion;
+
 - (NSString *)getAccountNameForAccountWithClientName:(NSString *)clientName andUserName:(NSString *)userName;
 
 - (BOOL)deleteAccountWithClientName:(NSString *)clientName andUserName:(NSString* )userName;

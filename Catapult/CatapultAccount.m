@@ -89,7 +89,7 @@
                                                                    accountID, forename, surname, accountName, clientName, logos[@"smallest_logo"], logos[@"thumb_logo"], @"1"];
                                            
                                            if (operationSuccessfull) {
-                                               FMResultSet *savedAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where account_name = ? limit 1", accountName];
+                                               FMResultSet *savedAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo, thumb_logo from accounts where account_name = ? limit 1", accountName];
                                                
                                                if ([savedAccount next]) {
                                                    createdAccount = [savedAccount resultDictionary];
@@ -336,7 +336,7 @@
         if ([self createAccountsTable]) {
             results = [NSMutableArray array];
             
-            FMResultSet *resultSet = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where account_name != ?", currentAccountName];
+            FMResultSet *resultSet = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo, thumb_logo from accounts where account_name != ?", currentAccountName];
             
             while ([resultSet next]) {
                 [results addObject:[resultSet resultDictionary]];
@@ -375,6 +375,87 @@
     NXOAuth2Account *currentNXOAuth2Account = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
     
     return (NSDictionary *)[currentNXOAuth2Account userData];
+}
+
+- (void)getCurrentClient:(void (^)(BOOL completed, NSDictionary *account, NSDictionary *user))completion
+{
+    __block NSMutableDictionary *currentClient = nil;
+    
+    NXOAuth2Account *currentAccount = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
+    
+    [NXOAuth2Request performMethod:@"GET"
+                        onResource:[NSURL URLWithString:[NSString stringWithFormat:@"%@/clients/%@", kCatapultHost, currentAccount.userData[@"account_name"]]]
+                   usingParameters:nil
+                       withAccount:currentAccount
+               sendProgressHandler:nil
+                   responseHandler:^ (NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if (error != nil) {
+#if DEBUG
+                           NSLog(@"ERROR: %@", error);
+#endif
+                           completion(NO, nil, nil);
+                       }
+                       else {
+                           NSError *jsonError;
+                           
+                           currentClient = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                            options:kNilOptions
+                                                                              error:&jsonError];
+                           
+                           if (jsonError != nil) {
+#if DEBUG
+                               NSLog(@"Error: %@", jsonError);
+#endif
+                               completion(NO, nil, nil);
+                           } else {
+                               [self getCurrentUser:^ (BOOL completed, NSDictionary *user) {
+                                   if (completed) {
+                                       completion(YES, currentClient, user);
+                                   } else {
+                                       completion(NO, nil, nil);
+                                   }
+                               }];
+                           }
+                       }
+                   }];
+}
+
+- (void)getCurrentUser:(void (^)(BOOL completed, NSDictionary *user))completion
+{
+    __block BOOL operationSuccessful = NO;
+    __block NSDictionary *currentUser = nil;
+    NXOAuth2Account *currentAccount = [[[NXOAuth2AccountStore sharedStore] accounts] lastObject];
+    
+    [NXOAuth2Request performMethod:@"GET"
+                        onResource:[NSURL URLWithString:[NSString stringWithFormat:@"%@/users/me/full", kCatapultHost]]
+                   usingParameters:nil
+                       withAccount:currentAccount
+               sendProgressHandler:nil
+                   responseHandler:^ (NSURLResponse *response, NSData *responseData, NSError *error) {
+                       if (error != nil) {
+                           operationSuccessful = NO;
+#if DEBUG
+                           NSLog(@"Error: %@", error);
+#endif
+                       } else {
+                           operationSuccessful = YES;
+                           
+                           NSError *jsonError;
+                           
+                           currentUser = [NSJSONSerialization JSONObjectWithData:responseData
+                                                                         options:kNilOptions
+                                                                           error:&jsonError];
+                           
+                           if (jsonError != nil) {
+                               operationSuccessful = NO;
+#if DEBUG
+                               NSLog(@"Error: %@", jsonError);
+#endif
+                           }
+                       }
+                       
+                       completion(operationSuccessful, currentUser);
+                   }];
 }
 
 - (NSString *)getAccountNameForAccountWithClientName:(NSString *)clientName andUserName:(NSString *)userName
@@ -467,7 +548,7 @@
             operationSuccessfull = [self.db executeUpdate:@"update accounts set logged_in = 1 where client_name = ? and (forename || \" \" || surname = ?)", clientName, userName];
             
             if (operationSuccessfull) {
-                FMResultSet *currentAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo from accounts where logged_in = 1 limit 1"];
+                FMResultSet *currentAccount = [self.db executeQuery:@"select forename, surname, account_name, client_name, smallest_logo, thumb_logo from accounts where logged_in = 1 limit 1"];
                 
                 if ([currentAccount next]) {
                     account = [currentAccount resultDictionary];
