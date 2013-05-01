@@ -54,9 +54,6 @@
             _account = currentAccount;
             _user = currentUser;
             
-            //            NSLog(@"Account: %@", _account);
-            //            NSLog(@"User: %@", _user);
-            
             [self.tableView reloadData];
             
             [self stopAnimatingActivityIndicator];
@@ -240,16 +237,16 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-//    if (section == 0) {
-//        NSDictionary *account = (NSDictionary *)_account.userData;
-//        NSString *logoPath = account[@"thumb_logo"];
-//        UIImage *logo = [UIImage imageWithContentsOfFile:logoPath];
-//        UIImageView* headerView = [[UIImageView alloc] initWithImage:logo];
-//        headerView.contentMode = UIViewContentModeCenter;
-//        return headerView;
-//    } else {
+    if (section == 0) {
+        NSDictionary *account = (NSDictionary *)[[[[NXOAuth2AccountStore sharedStore] accounts] lastObject] userData];
+        NSString *logoPath = account[@"thumb_logo"];
+        UIImage *logo = [UIImage imageWithContentsOfFile:logoPath];
+        UIImageView* headerView = [[UIImageView alloc] initWithImage:logo];
+        headerView.contentMode = UIViewContentModeCenter;
+        return headerView;
+    } else {
         return [super tableView:tableView viewForHeaderInSection:section];
-//    }
+    }
 }
 
 /*
