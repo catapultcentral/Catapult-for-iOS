@@ -17,8 +17,7 @@
 @implementation CatapultCurrentAccountTableViewController
 {
     CatapultAccount *_accountModel;
-    NSDictionary *_account;
-    NSDictionary *_user;
+    NSMutableArray *_dataSource;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -51,9 +50,40 @@
     
     [_accountModel getCurrentClient:^ (BOOL completed, NSDictionary *currentAccount, NSDictionary *currentUser) {
         if (completed) {
-            _account = currentAccount;
-            _user = currentUser;
+            _dataSource = [[NSMutableArray alloc] init];
             
+            _dataSource[kCatapultCurrentAccountHeaderSection] = [[NSArray alloc] init];
+            _dataSource[kCatapultAccountDetailsSection]       = [[NSMutableArray alloc] init];
+            _dataSource[kCatapultOwnerDetailsSection]         = [[NSMutableArray alloc] init];
+            _dataSource[kCatapultPlanDetailsSection]          = [[NSMutableArray alloc] init];
+            _dataSource[kCatapultUserDetailsSection]          = [[NSMutableArray alloc] init];
+            
+            _dataSource[kCatapultAccountDetailsSection][kCatapultAccountClientName] = currentAccount[@"client"][@"client_name"];
+            _dataSource[kCatapultAccountDetailsSection][kCatapultAccountAccountName] = currentAccount[@"client"][@"account_name"];
+            _dataSource[kCatapultAccountDetailsSection][kCatapultAccountClientSince] = [self extractAndFormatRailsDateTime:currentAccount[@"client"][@"created_at"]];
+            _dataSource[kCatapultAccountDetailsSection][kCatapultAccountAffiliateCode] = ([currentAccount[@"client"][@"affiliate_code"] class] == [NSNull class] || currentAccount[@"client"][@"affiliate_code"] == nil) ? @"None" : currentAccount[@"client"][@"affiliate_code"];
+            
+            _dataSource[kCatapultOwnerDetailsSection][kCatapultOwnerForename] = currentAccount[@"client"][@"forename"];
+            _dataSource[kCatapultOwnerDetailsSection][kCatapultOwnerSurname] = currentAccount[@"client"][@"surname"];
+            _dataSource[kCatapultOwnerDetailsSection][kCatapultOwnerEmail] = currentAccount[@"client"][@"email_address"];
+            _dataSource[kCatapultOwnerDetailsSection][kCatapultOwnerPhoneNumber] = currentAccount[@"client"][@"phone_number"];
+            
+            _dataSource[kCatapultPlanDetailsSection][kCatapultPlanPlan] = currentAccount[@"plan"][@"name"];
+            _dataSource[kCatapultPlanDetailsSection][kCatapultPlanPrice] = ([currentAccount[@"plan"][@"price"] doubleValue] > 0) ? currentAccount[@"plan"][@"price"] : @"Free";
+            _dataSource[kCatapultPlanDetailsSection][kCatapultPlanMaxUsers] = ([currentAccount[@"plan"][@"max_users"] intValue] > 9999) ? @"Unlimited" : currentAccount[@"plan"][@"max_users"];
+            _dataSource[kCatapultPlanDetailsSection][kCatapultPlanMaxContacts] = ([currentAccount[@"plan"][@"max_contacts"] intValue] > 9999) ? @"Unlimited" : currentAccount[@"plan"][@"max_contacts"];
+            _dataSource[kCatapultPlanDetailsSection][kCatapultPlanMaxStorage] = ([currentAccount[@"plan"][@"max_storage"] intValue] > 9999) ? @"Unlimited" : currentAccount[@"plan"][@"max_storage"];
+            
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserForename] = currentUser[@"forename"];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserSurname] = currentUser[@"surname"];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserUsername] = currentUser[@"user_name"];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserEmail] = currentUser[@"email"];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserJobTitle] = ([currentUser[@"job_title"] class] == [NSNull class] || currentUser[@"job_title"] == nil) ? @"Unknown" : currentUser[@"job_title"];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserBirthday] = ([currentUser[@"birthday"] class] == [NSNull class] || currentUser[@"birthday"] == nil) ? @"Unknown" : [self extractAndFormatRailsDateTime:currentUser[@"birthday"]];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserJoinedOn] = [self extractAndFormatRailsDateTime:currentUser[@"created_at"]];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserLastUpdated] = [self extractAndFormatRailsDateTime:currentUser[@"updated_at"]];
+            _dataSource[kCatapultUserDetailsSection][kCatapultUserRole] = ([currentUser[@"admin"] intValue] == 1) ? @"Administrator" : @"User";
+
             [self.tableView reloadData];
             
             [self stopAnimatingActivityIndicator];
@@ -81,147 +111,7 @@
 {
     UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
     
-    NSString *cellDetailText;
-    
-    if (indexPath.section == kCatapultAccountDetailsSection) {
-        switch (indexPath.row) {
-            case kCatapultAccountClientName:
-            {
-                cellDetailText = _account[@"client"][@"client_name"];
-                break;
-            }
-            case kCatapultAccountAccountName:
-            {
-                cellDetailText = _account[@"client"][@"account_name"];
-                break;
-            }
-            case kCatapultAccountClientSince:
-            {
-                cellDetailText = [self extractAndFormatRailsDateTime:_account[@"client"][@"created_at"]];
-                break;
-            }
-            case kCatapultAccountAffiliateCode:
-            {
-                NSString *affiliateCode = _account[@"client"][@"affiliate_code"];
-                
-                cellDetailText = ([affiliateCode class] == [NSNull class] || affiliateCode == nil) ? @"None" : affiliateCode;
-                break;
-            }
-        }
-    } else if (indexPath.section == kCatapultOwnerDetailsSection) {
-        switch (indexPath.row) {
-            case kCatapultOwnerForename:
-            {
-                cellDetailText = _account[@"client"][@"forename"];
-                break;
-            }
-            case kCatapultOwnerSurname:
-            {
-                cellDetailText = _account[@"client"][@"surname"];
-                break;
-            }
-            case kCatapultOwnerEmail:
-            {
-                cellDetailText = _account[@"client"][@"email_address"];
-                break;
-            }
-            case kCatapultOwnerPhoneNumber:
-            {
-                cellDetailText = _account[@"client"][@"phone_number"];
-                break;
-            }
-        }
-    } else if (indexPath.section == kCatapultPlanDetailsSection) {
-        switch (indexPath.row) {
-            case kCatapultPlanPlan:
-            {
-                cellDetailText = _account[@"plan"][@"name"];
-                break;
-            }
-            case kCatapultPlanPrice:
-            {
-                NSString *price = _account[@"plan"][@"price"];
-
-                cellDetailText = ([price doubleValue] > 0) ? price : @"Free";
-                break;
-            }
-            case kCatapultPlanMaxUsers:
-            {
-                NSString *maxUsers = _account[@"plan"][@"max_users"];
-                
-                cellDetailText = ([maxUsers intValue] > 9999) ? @"Unlimited" : maxUsers;
-                break;
-            }
-            case kCatapultPlanMaxContacts:
-            {
-                NSString *maxContacts = _account[@"plan"][@"max_contacts"];
-                
-                cellDetailText = ([maxContacts intValue] > 9999) ? @"Unlimited" : maxContacts;
-                break;
-            }
-            case kCatapultPlanMaxStorage:
-            {
-                NSString *maxStorage = _account[@"plan"][@"max_storage"];
-                
-                cellDetailText = ([maxStorage intValue] > 9999) ? @"Unlimited" : maxStorage;
-                break;
-            }
-        }
-    } else if (indexPath.section == kCatapultUserDetailsSection) {
-        switch (indexPath.row) {
-            case kCatapultUserForename:
-            {
-                cellDetailText = _user[@"forename"];
-                break;
-            }
-            case kCatapultUserSurname:
-            {
-                cellDetailText = _user[@"surname"];
-                break;
-            }
-            case kCatapultUserUsername:
-            {
-                cellDetailText = _user[@"user_name"];
-                break;
-            }
-            case kCatapultUserEmail:
-            {
-                cellDetailText = _user[@"email"];
-                break;
-            }
-            case kCatapultUserJobTitle:
-            {
-                NSString *jobTitle = _user[@"job_title"];
-                
-                cellDetailText = ([jobTitle class] == [NSNull class] || jobTitle == nil) ? @"Unknown" : jobTitle;
-                break;
-            }
-            case kCatapultUserBirthday:
-            {
-                NSString *birthday = _user[@"birthday"];
-                
-                cellDetailText = ([birthday class] == [NSNull class] || birthday == nil) ? @"Unknown" : [self extractAndFormatRailsDateTime:birthday];
-                break;
-            }
-            case kCatapultUserJoinedOn:
-            {
-                cellDetailText = [self extractAndFormatRailsDateTime:_user[@"created_at"]];
-                break;
-            }
-            case kCatapultUserLastUpdated:
-            {
-                cellDetailText = [self extractAndFormatRailsDateTime:_user[@"updated_at"]];
-                break;
-            }
-            case kCatapultUserRole:
-            {
-                cellDetailText = ([_user[@"admin"] intValue] == 1) ? @"Administrator" : @"User";
-                break;
-            }
-        }
-    }
-    
-    cell.detailTextLabel.text = cellDetailText;
+    cell.detailTextLabel.text = _dataSource[indexPath.section][indexPath.row];
     
     return cell;
 }
@@ -238,6 +128,7 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     if (section == 0) {
+        // TODO: Somehow refresh the image once in a while
         NSDictionary *account = (NSDictionary *)[[[[NXOAuth2AccountStore sharedStore] accounts] lastObject] userData];
         NSString *logoPath = account[@"thumb_logo"];
         UIImage *logo = [UIImage imageWithContentsOfFile:logoPath];

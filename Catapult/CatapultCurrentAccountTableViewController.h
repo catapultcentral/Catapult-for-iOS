@@ -11,6 +11,7 @@
 #import "CatapultAccount.h"
 
 // Sections constants
+#define kCatapultCurrentAccountHeaderSection 0
 #define kCatapultAccountDetailsSection 1
 #define kCatapultOwnerDetailsSection 2
 #define kCatapultPlanDetailsSection 3
